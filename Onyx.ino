@@ -29,6 +29,22 @@ MCUFRIEND_kbv tft;
 #define YELLOW 0xFFE0
 #define WHITE 0xFFFF
 
+#define CHAR_WIDTH 6
+
+// Define the ASCII art numbers
+const char* asciiNumbers[] = {
+  "_______   \n\\   _  \\  \n/  /_\\  \\ \n\\  \\_/   \\ \n \\_____  / \n       \\/  \n",
+  " ____     \n/_   |    \n |   |    \n |   |    \n |___|    \n",
+  "________   \n\\_____  \\  \n /  ____/  \n/       \\  \n\\_______ \\ \n        \\/ \n",
+  "________   \n\\_____  \\  \n  _(__  <  \n /       \\ \n/______  / \n       \\/  \n",
+  "   _____   \n  /  |  |  \n /   |  |_ \n/    ^   / \n\\____   |  \n     |__|  \n",
+  " .________ \n |   ____/ \n |____  \\  \n /       \\ \n/______  / \n       \\/  \n",
+  "  ________ \n /  _____/ \n/   __  \\  \n\\  |__\\  \\ \n \\_____  / \n       \\/  \n",
+  "_________  \n\\______  \\ \n    /    / \n   /    /  \n  /____/   \n",
+  "           \n  ______   \n /  __  \\  \n >      <  \n/   --   \\ \n\\______  / \n       \\/  \n",
+  " ________  \n/   __   \\ \n\\____    / \n   /    /  \n  /____/   \n          \n"
+};
+
 void setup() {
   Serial.begin(115200);
 
@@ -41,7 +57,43 @@ void setup() {
   tft.setCursor(0, 0);
   tft.setTextColor(GREEN);
   tft.setTextSize(1);
-  tft.println("> Hello World!");
+  // tft.println("> Hello World!");
+  typeTextWithCursor("> Hello, World!", 0, 0, 100);
+
+  delay(1000);
 }
 
-void loop() {}
+void loop() {
+  // Display numbers from 0 to 9
+  for (int i = 0; i < 10; i++) {
+    tft.fillScreen(BLACK);
+    tft.setCursor(0, 0);
+    tft.setTextColor(GREEN);
+    tft.setTextSize(1);
+    tft.println("> Hello World!");
+    displayAsciiNumber(i, 20, 20);
+    delay(1000);
+  }
+}
+
+void displayAsciiNumber(int number, int x, int y) {
+  // Split the ASCII art into lines and print each line
+  char* asciiArt = strdup(asciiNumbers[number]);
+  char* line = strtok(asciiArt, "\n");
+  while (line != NULL) {
+    tft.setCursor(x, y);        // Set the cursor position
+    tft.println(line);          // Print the line
+    line = strtok(NULL, "\n");  // Move to the next line
+    y = tft.getCursorY();       // Adjust the y coordinate for the next line
+  }
+  free(asciiArt);  // Free the dynamically allocated memory
+}
+
+void typeTextWithCursor(const char* text, int x, int y, int delayMs) {
+  for (int i = 0; text[i] != '\0'; i++) {
+    tft.print(text[i]);
+    delay(delayMs);
+    x += CHAR_WIDTH;      // Move the cursor by an estimated character width
+    tft.setCursor(x, y);  // Set the cursor position for the next character
+  }
+}
